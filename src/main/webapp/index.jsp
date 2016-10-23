@@ -69,17 +69,18 @@ connect.close();
 	var map;
 	var markers;
 	var markerCluster;
+	scrollId="";
 	limit=5000;
 	lastCount=0;
-	setInterval(loadNewLocations, 5000);
 	loadLocations();
 	
 	
 	function loadNewLocations() {
-		$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch?lastCount="+lastCount, function(results, status){
+		$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch?scrollId="+scrollId, function(results, status){
         	
         	var result = JSON.parse(results);
         	var tweets = result.tweets;
+        	scrollId=result.scrollId;
         	lastCount+=tweets.length;
         	if(lastCount>limit){
         		limit+=10000;
@@ -108,25 +109,23 @@ connect.close();
 	
 	
 	function loadLocations() {	
-		    	$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch?lastCount="+lastCount, function(results, status){
+		    	$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch", function(results, status){
 	            	//alert("Data: " + results + "\nStatus: " + status);
 	            	
 	            	var result = JSON.parse(results);
 	            	var tweets = result.tweets;
 	            	lastCount+=tweets.length;
+	            	scrollId=result.scrollId;
+	            	//alert(scrollId);
 	            	
 	         		for (var i=0;i <tweets.length; i++){
 	         			var newLocation = {lat : tweets[i].lat, lng : tweets[i].lng};
 	         			locations.push(newLocation);
 	         			
 	         		}
-
-	
+	         		setInterval(loadNewLocations, 5000);
 	         		initMap();
-	         		//google.maps.event.trigger(document.getElementById('map'), 'resize');
 	        	});
-	    	
-			
 	}
       function initMap() {
 
