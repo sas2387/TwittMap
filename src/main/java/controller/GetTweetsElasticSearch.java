@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.lucene.queryparser.xml.builders.RangeQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
@@ -44,6 +45,13 @@ public class GetTweetsElasticSearch extends HttpServlet {
         // Construct a new Jest client according to configuration via factory
         
 		String searchParameter = request.getParameter("keyword");
+		int lastcount=0;
+		try{
+			lastcount = Integer.parseInt(request.getParameter("lastCount"));
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		
 		JestClientFactory factory = new JestClientFactory();
         factory.setHttpClientConfig(new HttpClientConfig
@@ -54,12 +62,13 @@ public class GetTweetsElasticSearch extends HttpServlet {
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.size(1000);
+        searchSourceBuilder.from(lastcount);
         
         if(searchParameter != null && !"".equals(searchParameter))
-        	searchSourceBuilder.query(QueryBuilders.matchQuery("text",searchParameter));
+        		searchSourceBuilder.query(QueryBuilders.matchQuery("text",searchParameter));
         else 
-        	searchSourceBuilder.query(QueryBuilders.matchAllQuery());
-        	
+    	   searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+    
 
         Search search = new Search.Builder(searchSourceBuilder.toString())
                 // multiple index or types can be added.
@@ -69,14 +78,15 @@ public class GetTweetsElasticSearch extends HttpServlet {
 
         SearchResult result = client.execute(search);
         List<Tweet> tweets = result.getSourceAsObjectList(Tweet.class);
-        for(Tweet t:tweets){
-            System.out.println(t.getId());
-            System.out.println(t.getLat());
-            System.out.println(t.getLng());
-            System.out.println(t.getText());
-            System.out.println(t.getTime());
-            System.out.println(t.getUser());
-        }
+        if(tweets.size()>0) {
+//        for(Tweet t:tweets){
+//            System.out.println(t.getId());
+//            System.out.println(t.getLat());
+//            System.out.println(t.getLng());
+//            System.out.println(t.getText());
+//            System.out.println(t.getTime());
+//            System.out.println(t.getUser());
+//        }
         
         	Tweet t = null;
 	        PrintWriter pw = response.getWriter();
@@ -90,9 +100,7 @@ public class GetTweetsElasticSearch extends HttpServlet {
 		      pw.write("{\"lat\": "+t.getLat()+", \"lng\": "+t.getLng()+"}");
 		      pw.write("]}");
 		      pw.close();
-	        
-        
-        
+        }
     }
 	
 

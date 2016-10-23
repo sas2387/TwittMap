@@ -69,15 +69,23 @@ connect.close();
 	var map;
 	var markers;
 	var markerCluster;
-
-	setInterval(loadNewLocations, 10000);
+	limit=5000;
+	lastCount=0;
+	setInterval(loadNewLocations, 5000);
+	loadLocations();
 	
 	
 	function loadNewLocations() {
-		$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch", function(results, status){
+		$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch?lastCount="+lastCount, function(results, status){
         	
         	var result = JSON.parse(results);
         	var tweets = result.tweets;
+        	lastCount+=tweets.length;
+        	if(lastCount>limit){
+        		limit+=10000;
+        		clearMarkers();
+        	}
+   
         	
      		for (var i=0;i <tweets.length; i++){
      			var newLocation = {lat : tweets[i].lat, lng : tweets[i].lng};
@@ -91,7 +99,6 @@ connect.close();
      	            });
      			
      			newMarker.setMap(map);
-     			
      			markers.push(newMarker);
      		}
      		var markerCluster = new MarkerClusterer(map, markers,
@@ -101,39 +108,20 @@ connect.close();
 	
 	
 	function loadLocations() {	
-// 		var script = document.createElement('script');
-<%--     	script.src = '<%= request.getContextPath().toString()%>/gettweets'; --%>
-//     	document.getElementsByTagName('head')[0].appendChild(script);
-    
-// 		window.eqfeed_callback = function(results) {
-//     		//alert(results.tweets.length);
-    		
-//     		var tweets = results.tweets;
-//     		for (var i=0;i <tweets.length; i++){
-//     			var newLocation = {lat : tweets[i].lat, lng : tweets[i].lng};
-//     			locations.push(newLocation);
-//     		}
-//     		initMap();
-//     	}
-
-		    	$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch", function(results, status){
+		    	$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch?lastCount="+lastCount, function(results, status){
 	            	//alert("Data: " + results + "\nStatus: " + status);
 	            	
 	            	var result = JSON.parse(results);
 	            	var tweets = result.tweets;
-	            	
+	            	lastCount+=tweets.length;
 	            	
 	         		for (var i=0;i <tweets.length; i++){
 	         			var newLocation = {lat : tweets[i].lat, lng : tweets[i].lng};
 	         			locations.push(newLocation);
 	         			
-	         			var image = '<%= request.getContextPath().toString()%>/images/tweet_icon.png';
-	         			
 	         		}
-	            	
-	            	
-	            	
-	            	
+
+	
 	         		initMap();
 	         		//google.maps.event.trigger(document.getElementById('map'), 'resize');
 	        	});
@@ -167,6 +155,13 @@ connect.close();
         var markerCluster = new MarkerClusterer(map, markers,
             {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
       }
+      
+      google.maps.Map.prototype.clearMarkers = function() {
+    	    for(var i=0; i < this.markers.length; i++){
+    	        this.markers[i].setMap(null);
+    	    }
+    	    this.markers = new Array();
+    	};
      
       
       <%--<%
@@ -209,7 +204,7 @@ connect.close();
     </script>
   </head>
 
-<body onload="loadLocations()">
+<body">
 
 
 <div id="searchPanel" align="center" >
