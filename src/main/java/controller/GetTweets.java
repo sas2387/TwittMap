@@ -25,7 +25,7 @@ public class GetTweets extends HttpServlet{
 		try{
 		Class.forName("com.mysql.jdbc.Driver");
 	      // setup the connection with the DB.
-	      Connection connect = DriverManager.getConnection("jdbc:mysql://localhost/tweetmapdb?"
+	      Connection connect = DriverManager.getConnection("jdbc:mysql://localhost/tweetmap?"
 	              + "user=root&password=");
 	      // statements allow to issue SQL queries to the database
 	      Statement statement = connect.createStatement();
@@ -43,13 +43,13 @@ public class GetTweets extends HttpServlet{
 	      }
 	      connect.close();	
 	      PrintWriter pw = resp.getWriter();
-	      pw.write("eqfeed_callback({\"tweets\":[");
+	      pw.write("{\"tweets\":[");
 	      int i=0;
 	      for(i=0;i<latitudes.size()-1;i++){
-	    	  pw.write("{lat: "+latitudes.get(i)+", lng: "+longitudes.get(i)+"}, ");
+	    	  pw.write("{\"lat\": "+latitudes.get(i)+", \"lng\": "+longitudes.get(i)+"}, ");
 	      }
-	      pw.write("{lat: "+latitudes.get(i)+", lng: "+longitudes.get(i)+"}");
-	      pw.write("]})");
+	      pw.write("{\"lat\": "+latitudes.get(i)+", \"lng\": "+longitudes.get(i)+"}");
+	      pw.write("]}");
 	      pw.close();
 		}catch(Exception e){
 			e.printStackTrace();

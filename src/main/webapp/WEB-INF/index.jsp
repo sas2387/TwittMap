@@ -30,11 +30,6 @@
       }
  
     </style>
-    
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js">
-</script>
-
-
 <%-- <%
 String keyword = request.getParameter("keyword");
 
@@ -66,85 +61,12 @@ connect.close();
 %>--%> 
 	<script>
 	var locations = [];
-	var map;
-	var markers;
-	var markerCluster;
 
-	setInterval(loadNewLocations, 10000);
-	
-	
-	function loadNewLocations() {
-		$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch", function(results, status){
-        	
-        	var result = JSON.parse(results);
-        	var tweets = result.tweets;
-        	
-     		for (var i=0;i <tweets.length; i++){
-     			var newLocation = {lat : tweets[i].lat, lng : tweets[i].lng};
-     			locations.push(newLocation);
-     			
-     			var image = '<%= request.getContextPath().toString()%>/images/tweet_icon.png';
-     			
-     			var newMarker = new google.maps.Marker({
-     	              position: newLocation,
-     	              icon: image
-     	            });
-     			
-     			newMarker.setMap(map);
-     			
-     			markers.push(newMarker);
-     		}
-     		var markerCluster = new MarkerClusterer(map, markers,
-     	            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
-    	});
-	}
-	
-	
-	function loadLocations() {	
-// 		var script = document.createElement('script');
-<%--     	script.src = '<%= request.getContextPath().toString()%>/gettweets'; --%>
-//     	document.getElementsByTagName('head')[0].appendChild(script);
-    
-// 		window.eqfeed_callback = function(results) {
-//     		//alert(results.tweets.length);
-    		
-//     		var tweets = results.tweets;
-//     		for (var i=0;i <tweets.length; i++){
-//     			var newLocation = {lat : tweets[i].lat, lng : tweets[i].lng};
-//     			locations.push(newLocation);
-//     		}
-//     		initMap();
-//     	}
-
-		    	$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch", function(results, status){
-	            	//alert("Data: " + results + "\nStatus: " + status);
-	            	
-	            	var result = JSON.parse(results);
-	            	var tweets = result.tweets;
-	            	
-	            	
-	         		for (var i=0;i <tweets.length; i++){
-	         			var newLocation = {lat : tweets[i].lat, lng : tweets[i].lng};
-	         			locations.push(newLocation);
-	         			
-	         			var image = '<%= request.getContextPath().toString()%>/images/tweet_icon.png';
-	         			
-	         		}
-	            	
-	            	
-	            	
-	            	
-	         		initMap();
-	         		//google.maps.event.trigger(document.getElementById('map'), 'resize');
-	        	});
-	    	
-			
-	}
       function initMap() {
 
-        map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 2,
-          center: {lat: 34.5133, lng: -94.1629}//{lat: -28.024, lng: 140.887}
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 1,
+          center: {lat: -28.024, lng: 140.887}
         });
 
         // Add some markers to the map.
@@ -154,9 +76,19 @@ connect.close();
        
         var image = '<%= request.getContextPath().toString()%>/images/tweet_icon.png';
 
+        var script = document.createElement('script');
+        script.src = '<%= request.getContextPath().toString()%>/gettweets';
+        document.getElementsByTagName('head')[0].appendChild(script);
         
+        window.eqfeed_callback = function(results) {
+        	alert(results.tweets.length);
+        	for (var i=0;i <tweets.length; i++){
+				//locations.
+				
+        	}
+        }
         
-        markers = locations.map(function(location, i) {
+        var markers = locations.map(function(location, i) {
             return new google.maps.Marker({
               position: location,
               icon: image
@@ -182,7 +114,7 @@ connect.close();
     <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUx6LjDDN-OHV7RxlPxNCZnm98vvNH87I&callback=initMap"> 
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUx6LjDDN-OHV7RxlPxNCZnm98vvNH87I&callback=initMap">
     </script>
     <script type="text/javascript">
     function hideAndShow() {
@@ -209,7 +141,7 @@ connect.close();
     </script>
   </head>
 
-<body onload="loadLocations()">
+<body>
 
 
 <div id="searchPanel" align="center" >

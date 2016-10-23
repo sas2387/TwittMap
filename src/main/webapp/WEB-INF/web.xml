@@ -9,10 +9,20 @@
   	<servlet-name>GetTweets</servlet-name>
   	<servlet-class>controller.GetTweets</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>GetTweetsElasticSearch</servlet-name>
+  	<display-name>GetTweetsElasticSearch</display-name>
+  	<description></description>
+  	<servlet-class>controller.GetTweetsElasticSearch</servlet-class>
+  </servlet>
   
   <servlet-mapping>
   	<servlet-name>GetTweets</servlet-name>
   	<url-pattern>/gettweets</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>GetTweetsElasticSearch</servlet-name>
+  	<url-pattern>/GetTweetsElasticSearch</url-pattern>
   </servlet-mapping>
   
   
