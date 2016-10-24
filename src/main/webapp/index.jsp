@@ -8,29 +8,35 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-<meta charset="utf-8">
-<title>Marker Clustering</title>
-<style>
-html, body {
-	height: 100%;
-	margin: 0;
-	padding: 0;
-}
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>10k Tweets by HW Group 35</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+        width: 80%;
+        float: right;
+      }
+      #searchPanel {
+      	height: 100%;
+        width: 20%;
+        float: left;
+        background-color: #EDE8E8;
+      }
+ 
+    </style>
+    
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js">
+</script>
 
-#map {
-	height: 100%;
-	width: 80%;
-	float: right;
-}
 
-#searchPanel {
-	height: 100%;
-	width: 20%;
-	float: left;
-	background-color: #EDE8E8;
-}
-</style>
+
+
 
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js">
@@ -150,7 +156,7 @@ html, body {
     	    markerCluster.repaint();
     	    
     	    map = new google.maps.Map(document.getElementById('map'), {
-    	          zoom: 1,
+    	          zoom: 2,
     	          center: {lat: 34.5133, lng: -94.1629}
     	        });
     	    markerCluster = new MarkerClusterer(map, markers,

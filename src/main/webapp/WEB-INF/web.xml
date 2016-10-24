@@ -7,7 +7,7 @@
 	
 	<context-param>
 		<param-name>googleMapAPIKey</param-name>
-		<param-value>PUT_YOUR_MAP_API_KEY_HERE</param-value>
+		<param-value>YOUR-MAP-API-KEY</param-value>
 	</context-param>
 	<context-param>
 		<param-name>elasticSearchURL</param-name>
