@@ -2,6 +2,7 @@ package controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -42,6 +43,7 @@ public class GetTweetsElasticSearch extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@SuppressWarnings("deprecation")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
@@ -51,6 +53,7 @@ public class GetTweetsElasticSearch extends HttpServlet {
         
 		String searchParameter = request.getParameter("keyword");
 		String scrollIdParameter = request.getParameter("scrollId");
+		request.setAttribute("keyWord", searchParameter);
 		//System.out.println(scrollIdParameter);
 
 		
@@ -92,25 +95,36 @@ public class GetTweetsElasticSearch extends HttpServlet {
         List<Tweet> tweets = result.getSourceAsObjectList(Tweet.class);
         //System.out.println(tweets.size());
         if(tweets.size()>0) {
-//        for(Tweet t:tweets){
-//            System.out.println(t.getId());
-//            System.out.println(t.getLat());
-//            System.out.println(t.getLng());
-//            System.out.println(t.getText());
-//            System.out.println(t.getTime());
-//            System.out.println(t.getUser());
-//        }
+
         
         	Tweet t = null;
+        	String text = null;
 	        PrintWriter pw = response.getWriter();
 		      pw.write("{\"tweets\":[");
 		      int i=0;
-		      for(i=0;i<tweets.size()-1;i++){
+		      for(i=0;i<tweets.size()-1;i++) {
 		    	  t = tweets.get(i);
-		    	  pw.write("{\"lat\": "+t.getLat()+", \"lng\": "+t.getLng()+"}, ");
+		    	  text = t.getText();/*.replaceAll("\"", "\\\\\"");
+		    	  text = text.replaceAll("'", "\\\\\'");
+		    	  text = text.replaceAll("\\[", " ");
+		  		  text = text.replaceAll("\\]", " ");
+		  		  text = text.replaceAll("\\{", " ");
+		  		  text = text.replaceAll("\\}", " ");
+		  		  //text = text.replaceAll("\\s+", "");*/
+		  		
+		    	  System.out.println(text);
+		    	  pw.write("{\"lat\": "+t.getLat()+", \"lng\": "+t.getLng()+", \"text\":\""+URLEncoder.encode(text,"UTF-8")+"\"}, ");
 		      }
 		      t = tweets.get(i);
-		      pw.write("{\"lat\": "+t.getLat()+", \"lng\": "+t.getLng()+"}");
+		      text = t.getText();/*.replaceAll("\"", "\\\\\"");
+		      text = text.replaceAll("'", "\\\\\'");
+		      text = text.replaceAll("\\[", " ");
+	  		  text = text.replaceAll("\\]", " ");
+	  		  text = text.replaceAll("\\{", " ");
+	  		  text = text.replaceAll("\\}", " ");
+	  		  //text = text.replaceAll("\\s+", "");
+		      System.out.println(text);*/
+		      pw.write("{\"lat\": "+t.getLat()+", \"lng\": "+t.getLng()+", \"text\":\""+URLEncoder.encode(text,"UTF-8")+"\"}");
 		      pw.write("], \"scrollId\" : \""+scrollId+"\"}");
 		      pw.close();
         }

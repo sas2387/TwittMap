@@ -15,6 +15,12 @@
   	<description></description>
   	<servlet-class>controller.GetTweetsElasticSearch</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>GetTweetsScrollAPI</servlet-name>
+  	<display-name>GetTweetsScrollAPI</display-name>
+  	<description></description>
+  	<servlet-class>controller.GetTweetsScrollAPI</servlet-class>
+  </servlet>
   
   <servlet-mapping>
   	<servlet-name>GetTweets</servlet-name>
@@ -23,6 +29,10 @@
   <servlet-mapping>
   	<servlet-name>GetTweetsElasticSearch</servlet-name>
   	<url-pattern>/GetTweetsElasticSearch</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>GetTweetsScrollAPI</servlet-name>
+  	<url-pattern>/GetTweetsScrollAPI</url-pattern>
   </servlet-mapping>
   
   

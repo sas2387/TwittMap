@@ -66,25 +66,28 @@ connect.close();
 %>--%> 
 	<script>
 	var locations = [];
+	var tweetsText = [];
 	var map;
 	var markers;
 	var markerCluster;
 	scrollId="";
-	limit=5000;
+	limit=10000;
 	lastCount=0;
-	loadLocations();
+	
 	
 	
 	function loadNewLocations() {
-		$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch?scrollId="+scrollId, function(results, status){
+		var keywordVal = document.getElementById('keyword').value;
+		$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch?scrollId="+scrollId+"&keyword="+keywordVal, function(results, status){
         	
         	var result = JSON.parse(results);
         	var tweets = result.tweets;
         	scrollId=result.scrollId;
         	lastCount+=tweets.length;
+        	//alert(lastCount)
         	if(lastCount>limit){
-        		limit+=10000;
-        		clearMarkers();
+        		limit+=5000;
+        		clearMarkersaa();
         	}
    
         	
@@ -92,38 +95,55 @@ connect.close();
      			var newLocation = {lat : tweets[i].lat, lng : tweets[i].lng};
      			locations.push(newLocation);
      			
+     			var tweetText = tweets[i].text;
+     			
      			var image = '<%= request.getContextPath().toString()%>/images/tweet_icon.png';
      			
      			var newMarker = new google.maps.Marker({
      	              position: newLocation,
-     	              icon: image
+     	              icon: image,
+     	              title : decodeURIComponent((tweetText+'').replace(/\+/g, '%20'))
      	            });
      			
      			newMarker.setMap(map);
      			markers.push(newMarker);
      		}
-     		var markerCluster = new MarkerClusterer(map, markers,
+     		markerCluster = new MarkerClusterer(map, markers,
      	            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
     	});
 	}
 	
 	
 	function loadLocations() {	
-		    	$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch", function(results, status){
+		var keywordVal = document.getElementById('keyword').value;
+		
+		
+		    	$.get("<%= request.getContextPath().toString()%>/GetTweetsElasticSearch?keyword="+keywordVal, function(results, status){
 	            	//alert("Data: " + results + "\nStatus: " + status);
 	            	
+	            	if(keywordVal != null && keywordVal != ""){
+	            		clearInterval(interval);
+	            		locations = [];
+						tweetsText = [];
+						
+						clearMarkersaa();
+	            	}
 	            	var result = JSON.parse(results);
+	            	alert(result.tweets.length)
 	            	var tweets = result.tweets;
 	            	lastCount+=tweets.length;
 	            	scrollId=result.scrollId;
 	            	//alert(scrollId);
 	            	
 	         		for (var i=0;i <tweets.length; i++){
-	         			var newLocation = {lat : tweets[i].lat, lng : tweets[i].lng};
+	         			var newLocation = {location : {lat : tweets[i].lat, lng : tweets[i].lng}, text : tweets[i].text};
 	         			locations.push(newLocation);
+	         			tweetsText.push(tweets[i].text);
 	         			
 	         		}
-	         		setInterval(loadNewLocations, 5000);
+	         		alert(locations.length)
+	         		if(keywordVal == null || keywordVal == "")
+	         			interval = setInterval(loadNewLocations, 10000);
 	         		initMap();
 	        	});
 	}
@@ -141,28 +161,49 @@ connect.close();
        
         var image = '<%= request.getContextPath().toString()%>/images/tweet_icon.png';
 
-        
-        
         markers = locations.map(function(location, i) {
             return new google.maps.Marker({
-              position: location,
-              icon: image
+              position: location.location,
+              icon: image,
+              title : decodeURIComponent((location.text+'').replace(/\+/g, '%20'))//decodeURIComponent((tweetsText[i]+'').replace(/\+/g, '%20'))
             });
           });
 
         // Add a marker clusterer to manage the markers.
-        var markerCluster = new MarkerClusterer(map, markers,
+        markerCluster = new MarkerClusterer(map, markers,
             {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
       }
       
-      google.maps.Map.prototype.clearMarkers = function() {
+      /*google.maps.Map.prototype.clearMarkers = function() {
     	    for(var i=0; i < this.markers.length; i++){
     	        this.markers[i].setMap(null);
     	    }
     	    this.markers = new Array();
-    	};
+    	    alert("clear markers");
+    	};*/
      
       
+    	
+    	function clearMarkersaa() {
+    	    for(var i=0; i < this.markers.length; i++){
+    	        this.markers[i].setMap(null);
+    	    }
+    	    this.markers = [];
+    	    alert("clear markers" + markers.length);
+    	    //markerCluster.setMap(null);
+    	    markerCluster.repaint();
+    	    
+    	    map = new google.maps.Map(document.getElementById('map'), {
+    	          zoom: 2,
+    	          center: {lat: 34.5133, lng: -94.1629}//{lat: -28.024, lng: 140.887}
+    	        });
+    	    markerCluster = new MarkerClusterer(map, markers,
+    	            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+    	
+    	    markerCluster.clearMarkers();
+    	    
+    	}
+    	
       <%--<%
       int i=0;
       for(i=0;i<latitudes.size()-1;i++){
@@ -203,7 +244,7 @@ connect.close();
     </script>
   </head>
 
-<body">
+<body>
 
 
 <div id="searchPanel" align="center" >
@@ -216,16 +257,23 @@ connect.close();
 	
 	<br><br><br><br><br><br><br><br>
 	
-	<form id="searchForm" name="searchForm" method="get" action="index.jsp" style="margin-top: 35%">
+	<form id="searchForm" name="searchForm" method="get" action="javascript::loadLocations()" style="margin-top: 35%">
+		<table>
+		<tr>
+		<td>Select Keyword</td>
+		</tr>
+		<tr><td>
 		<select id="keyword" name="keyword">
-			<option id="">--select--</option>
-			<option id="love">Love</option>
-			<option id="travel">Travel</option>
-			<option id="friend">Friend</option>
-			<option id="fun">Fun</option>
-			<option id="trump">Trump</option>
-		</select>
-		<input type="submit" id="submit" value="Search" />
+			<option value="">--select--</option>
+			<option value="love">Love</option>
+			<option value="travel">Travel</option>
+			<option value="friend">Friend</option>
+			<option value="fun">Fun</option>
+			<option value="trump">Trump</option>
+		</select></td>
+		</tr>
+		<tr><td> <input type="submit" id="submit" value="Search" onclick="loadLocations()" /></td></tr>
+		</table>
 	
 	
 	</form>
@@ -236,7 +284,10 @@ connect.close();
 
 <div id="map">
 
-
 </div>
 </body>
+<script type="text/javascript">
+loadLocations();
+
+</script>
 </html>
