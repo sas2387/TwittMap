@@ -116,6 +116,12 @@ public class GetTweetsElasticSearch extends HttpServlet {
 					+ URLEncoder.encode(text, "UTF-8") + "\"}");
 			pw.write("], \"scrollId\" : \"" + scrollId + "\"}");
 			pw.close();
+		} else {
+			PrintWriter pw = response.getWriter();
+			pw.write("{\"tweets\":[");
+			pw.write("], \"scrollId\" : \"" + scrollId + "\"}");
+
+			pw.close();
 		}
 	}
 
