@@ -66,7 +66,7 @@ public class GetTweetsElasticSearch extends HttpServlet {
 		// System.out.println(scrollIdParameter);
 
 		JestClientFactory factory = new JestClientFactory();
-		factory.setHttpClientConfig(new HttpClientConfig.Builder(elasticSearchURL+":443").multiThreaded(true)
+		factory.setHttpClientConfig(new HttpClientConfig.Builder(elasticSearchURL).multiThreaded(true)
 						.build());
 		JestClient client = factory.getObject();
 
